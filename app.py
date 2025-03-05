@@ -1,12 +1,9 @@
-from flask import Flask, render_template, request, jsonify
-import http.client
-import json
+from flask import Flask, render_template, jsonify
+import requests
 
 app = Flask(__name__)
 
-# Spoonacular API details
-API_HOST = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com"
-API_KEY = "d9045911f0msha288e25cc902400p1dd65ejsn15a51e9fa5c0"
+MEAL_API_URL = "https://www.themealdb.com/api/json/v1/1/random.php"
 
 @app.route('/')
 def home():
@@ -14,30 +11,28 @@ def home():
 
 @app.route('/get_recipe', methods=['GET'])
 def get_recipe():
-    conn = http.client.HTTPSConnection(API_HOST)
-    headers = {
-        'x-rapidapi-key': API_KEY,
-        'x-rapidapi-host': API_HOST
-    }
-    conn.request("GET", "/recipes/random?tags=vegetarian,dessert&number=1", headers=headers)
-    res = conn.getresponse()
-    data = res.read()
+    response = requests.get(MEAL_API_URL)
     
-    recipe_data = json.loads(data.decode("utf-8"))
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch recipe"}), 500
     
-    if "recipes" not in recipe_data or not recipe_data["recipes"]:
+    data = response.json()
+    
+    if not data.get("meals"):
         return jsonify({"error": "No recipes found"}), 404
-    
-    recipe = recipe_data["recipes"][0]
-    
-    recipe_details = {
-        "title": recipe["title"],
-        "image": recipe["image"],
-        "instructions": recipe["instructions"] if "instructions" in recipe else "No instructions available.",
-        "source": recipe["sourceUrl"]
+
+    meal = data["meals"][0]
+
+    recipe = {
+        "name": meal["strMeal"],
+        "category": meal["strCategory"],
+        "area": meal["strArea"],
+        "image": meal["strMealThumb"],
+        "instructions": meal["strInstructions"],
+        "youtube": meal["strYoutube"],
     }
-    
-    return jsonify(recipe_details)
+
+    return jsonify(recipe)
 
 if __name__ == "__main__":
     app.run(debug=True)

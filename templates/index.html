@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Vegetarian Dessert Recipe</title>
+    <title>Random Meal Recipe</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         button { padding: 10px 15px; margin: 20px; cursor: pointer; }
         .recipe { border: 1px solid #ddd; padding: 15px; display: inline-block; width: 50%; margin-top: 20px; }
-        img { width: 200px; height: auto; }
+        img { width: 250px; height: auto; }
+        iframe { width: 300px; height: 200px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Get a Random Vegetarian Dessert Recipe</h1>
-    <button onclick="fetchRecipe()">Generate Recipe</button>
+    <h1>Get a Random Meal Recipe</h1>
+    <button onclick="fetchRecipe()">Show Recipe</button>
     
     <div id="recipeContainer"></div>
 
@@ -26,13 +27,15 @@
                     document.getElementById("recipeContainer").innerHTML = `<p style="color: red;">${data.error}</p>`;
                     return;
                 }
-                
+
                 document.getElementById("recipeContainer").innerHTML = `
                     <div class="recipe">
-                        <h2>${data.title}</h2>
-                        <img src="${data.image}" alt="${data.title}">
+                        <h2>${data.name}</h2>
+                        <p><strong>Category:</strong> ${data.category}</p>
+                        <p><strong>Region:</strong> ${data.area}</p>
+                        <img src="${data.image}" alt="${data.name}">
                         <p><strong>Instructions:</strong> ${data.instructions}</p>
-                        <p><a href="${data.source}" target="_blank">View Full Recipe</a></p>
+                        ${data.youtube ? `<iframe src="${data.youtube.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>` : ""}
                     </div>
                 `;
             })
