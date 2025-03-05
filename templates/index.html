@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Vegetarian Dessert Recipe</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        button { padding: 10px 15px; margin: 20px; cursor: pointer; }
+        .recipe { border: 1px solid #ddd; padding: 15px; display: inline-block; width: 50%; margin-top: 20px; }
+        img { width: 200px; height: auto; }
+    </style>
+</head>
+<body>
+    <h1>Get a Random Vegetarian Dessert Recipe</h1>
+    <button onclick="fetchRecipe()">Generate Recipe</button>
+    
+    <div id="recipeContainer"></div>
+
+    <script>
+        function fetchRecipe() {
+            fetch("/get_recipe")
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("recipeContainer").innerHTML = `<p style="color: red;">${data.error}</p>`;
+                    return;
+                }
+                
+                document.getElementById("recipeContainer").innerHTML = `
+                    <div class="recipe">
+                        <h2>${data.title}</h2>
+                        <img src="${data.image}" alt="${data.title}">
+                        <p><strong>Instructions:</strong> ${data.instructions}</p>
+                        <p><a href="${data.source}" target="_blank">View Full Recipe</a></p>
+                    </div>
+                `;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
